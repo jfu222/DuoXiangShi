@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "DuoXiangShi.h"
+#include "DuoXiangShiZuHe.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -22,6 +23,18 @@ int print_help(int argc, char *argv[])
 
 
 int main(int argc, char *argv[])
+{
+    int ret = 0;
+    CDuoXiangShiZuHe dxszh;
+    std::string strSrc26EnglishLetters = "abcd";
+    int exponential = 4;
+    std::vector<std::string> vecStrsDst;
+    dxszh.createCombinePolynomial(strSrc26EnglishLetters, exponential, vecStrsDst);
+
+    return 0;
+}
+
+int main2(int argc, char *argv[])
 {
     int ret = 0;
     int cnt = 0;
