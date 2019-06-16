@@ -1100,59 +1100,6 @@ int CDuoXiangShi::setStrValue(std::string strSrc, int momomialValue[27], std::st
                     continue;
                 }
 
-/*
-                std::vector<std::string> vecStrs1;
-
-                ret = splitPlusAndMunisItems(strTemp22, vecStrs1);
-                if(ret != 0)
-                {
-                    printf("Error: %s: 1111\n", __FUNCTION__);
-                    return -1;
-                }
-
-                //---------------------------
-                int len1 = vecStrs1.size();
-                std::string strTemp33 = "";
-
-                for(int i = 0; i < len1; ++i)
-                {
-                    std::string str1 = vecStrs1[i];
-                    int momomial[27] = {0};
-                    ret = splitMonomial(str1, momomial);
-                    if(ret != 0)
-                    {
-                        printf("Error: %s 2222\n", __FUNCTION__);
-                        return -1;
-                    }
-
-                    //--------------------
-                    int result[27] = {0};
-                    ret = setMomomialValue(momomial, momomialValue, result);
-                    if(ret != 0)
-                    {
-                        printf("Error: %s 3333\n", __FUNCTION__);
-                        return -1;
-                    }
-
-                    //--------------------
-                    std::string str2 = "";
-                    ret = convertMonomialToStr(result, str2);
-                    if(ret != 0)
-                    {
-                        printf("Error: %s 4444\n", __FUNCTION__);
-                        return -1;
-                    }
-
-                    //-------------------
-                    strTemp33 += str2;
-                }
-
-                //-------------------
-                std::string strTemp44 = strTemp1.substr(0, p3 - p1 + 1);
-                std::string strTemp55 = strTemp1.substr(p2 - p1);
-
-                strTemp1 = strTemp44 + strTemp33 + strTemp55;
-*/
                 p1 = strTemp1.c_str();
                 len = strTemp1.length();
                 p2 = p1;

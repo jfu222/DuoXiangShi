@@ -409,14 +409,52 @@ int CDuoXiangShiZuHe::loopPolynomialCoefficientsValues(std::vector<std::string> 
     int len = strSrcVecs.size();
     int ret = 0;
     int cnt = 0;
+    std::string str = "";
+    std::string str2 = "";
+    std::string str3 = "";
     
+    int momomialValue[27] = {0};
+    
+    for(int i = 0; i < 26; ++i)
+    {
+        momomialValue[i] = 1;
+    }
+
+    //----------------------
+    CDuoXiangShi dxs;
+    
+    std::vector<std::string> strSrcVecs2;
+    std::vector<int> valueVecs2;
+    
+    for(int i = 0; i < len; ++i)
+    {
+        //-----------------------
+        str = strSrcVecs[i];
+        str2 = str;
+        printf("%s: str: %s\n", __FUNCTION__, str.c_str());
+
+        ret = dxs.justDoIt(str, str2); //打开括号，以便加快速度
+
+        printf("%s: str2: %s\n", __FUNCTION__, str2.c_str());
+
+        strSrcVecs2.push_back(str2);
+        
+        //------------------------------------------------
+        ret = dxs.setStrValue(str2, momomialValue, str3);
+
+        printf("str3: 4444: %s\n", str3.c_str());
+
+        int value = atoi(str3.c_str());
+        valueVecs2.push_back(value);
+    }
+
     //---------------------------
     int baseN = loopValueMax + 1;
     std::vector<int> maxVecCnt; //计数器
     std::vector<int> maxVecNum;
     std::vector<int> summandVec; //被加数
 
-     for(int i = 0; i < len; ++i)
+    for(int i = 0; i < len; ++i)
     {
         maxVecCnt.push_back(0);
         maxVecNum.push_back(baseN - 1);
@@ -427,52 +465,84 @@ int CDuoXiangShiZuHe::loopPolynomialCoefficientsValues(std::vector<std::string> 
     summandVec[len - 1] = 1; //被加数个位置1，每次加一
     
     //--------------------------
-    std::string str = "";
-    std::string str2 = "";
-    CDuoXiangShi dxs;
+    char out[] = "./out_result.log";
+    FILE * fp = fopen(out, "w");
 
     while(isTwoVecNumberLe(maxVecCnt, maxVecNum) == true) //相当于 i <= len;
     {
-        printf("%s: maxVecCnt = [%d, %d, %d, %d];\n", __FUNCTION__, maxVecCnt[0], maxVecCnt[1], maxVecCnt[2], maxVecCnt[3]);
+        printf("%s: maxVecCnt = [", __FUNCTION__);
+        for (int i = 0; i < len; ++i)
+        {
+            printf("%d, ", maxVecCnt[i]);
+        }
+        printf("];\n", __FUNCTION__);
         
+        //----------------
         str = "";
+        int valueTotal = 0;
+        int flag = 0;
         for(int i = 0; i < len; ++i)
         {
-            if(maxVecCnt[i] > 0 && maxVecCnt[i] <= loopValueMax)
+            int coefficients = maxVecCnt[i] - loopValueMax / 2;
+            flag = 0;
+            if(maxVecCnt[i] > 0 && maxVecCnt[i] <= loopValueMax && coefficients != 0)
             {
-                int coefficients = maxVecCnt[i] - loopValueMax / 2;
-                str += std::to_string(coefficients) + strSrcVecs[i]; //str2 = "3(+a+b+c)(ab+ac+bc)";
+//                str += std::to_string(coefficients) + strSrcVecs[i]; //str2 = "3(+a+b+c)(ab+ac+bc)";
+
+                if(coefficients >= 0)
+                {
+                    str += "+" + std::to_string(coefficients) + "(" + strSrcVecs2[i] + ")"; //str2 = "3(+a+b+c)(ab+ac+bc)";
+                }else
+                {
+                    str += std::to_string(coefficients) + "(" + strSrcVecs2[i] + ")"; //str2 = "3(+a+b+c)(ab+ac+bc)";
+                }
+
+                valueTotal += coefficients * valueVecs2[i];
+                flag = 1;
             }
         }
 
-        //-----------------------
-        str2 = str;
-        printf("%s: str: %s\n", __FUNCTION__, str.c_str());
-
-        ret = dxs.justDoIt(str, str2);
-
-        printf("%s: str2: %s\n", __FUNCTION__, str2.c_str());
-
-        //-------------
-        if(str2.length() < 20)
+        //--------------------
+        if(valueTotal == 0 && flag == 1)
         {
-            char out[] = "./out_result.log";
+            //-----------------------
+            str2 = str;
+            printf("%s: str: %s\n", __FUNCTION__, str.c_str());
 
-            FILE * fp = fopen(out, "w");
-            
-            std::string strTemp = "-----------cnt=" + std::to_string(cnt) + ";\r\n";
-            for(int i = 0; i < len; ++i)
+            ret = dxs.justDoIt(str, str2);
+
+            printf("%s: str2: %s\n", __FUNCTION__, str2.c_str());
+
+            //-------------
+            if(str2.length() < 50)
             {
-                strTemp += "maxVecCnt[" + std::to_string(i) + "]=" + std::to_string(maxVecCnt[i]) + "; ";
+                std::string strTemp = "-----------cnt=" + std::to_string(cnt) + ";\n";
+                std::string strTemp2 = "";
+                for(int i = 0; i < len; ++i)
+                {
+                    int coefficients = maxVecCnt[i] - loopValueMax / 2;
+                    int coefficients2 = 0;
+                    if(maxVecCnt[i] > 0 && coefficients != 0)
+                    {
+                        if(coefficients > 0)
+                        {
+                            strTemp2 += "+" + std::to_string(coefficients) + strSrcVecs[i]; //str2 = "3(+a+b+c)(ab+ac+bc)";
+                        }else
+                        {
+                            strTemp2 += std::to_string(coefficients) + strSrcVecs[i]; //str2 = "3(+a+b+c)(ab+ac+bc)";
+                        }
+
+                        coefficients2 = coefficients;
+                    }
+                    strTemp += "[" + std::to_string(i) + "]=" + std::to_string(coefficients2) + "; ";
+                }
+
+                strTemp += "\n" + strTemp2 + "\n" + str2 + "\n";
+
+                fwrite(strTemp.c_str(), strTemp.length(), 1, fp);
             }
-
-            strTemp += str + "\r\n" + str2 + "\r\n";
-
-            fwrite(strTemp.c_str(), strTemp.length(), 1, fp);
-
-            fclose(fp);
         }
-
+        
         //-------------
         cnt++;
 
@@ -482,6 +552,8 @@ int CDuoXiangShiZuHe::loopPolynomialCoefficientsValues(std::vector<std::string> 
             break;
         }
     }
+    
+    fclose(fp);
 
     return 0;
 }
