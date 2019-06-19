@@ -188,6 +188,13 @@ public:
 }Momomia3;
 
 
+typedef struct _PolynomialExponential_
+{
+    std::string strPolynomial; //以多项式为底数
+    int exponential; //多项式的指数，(a+b+c)^7中的7
+}PolynomialExponential;
+
+
 //-------------------------------------
 class CDuoXiangShiZuHe
 {
@@ -205,6 +212,6 @@ public:
 
     int vecPlusNonBaseN(std::vector<int> srcVec, std::vector<int> baseNVec, std::vector<int> summandVec, std::vector<int> &dstVec); //非等进制数组的加法（比如：个位为5进制，十位为3进制，...），主要用于替代多层for循环
 
-    int loopPolynomialCoefficientsValues(std::vector<std::string> strSrcVecs, int loopValueMax); //循环尝试多个多项式线性组合值为0
+    int loopPolynomialCoefficientsValues(std::vector<std::string> strSrcVecs, int loopValueMax, std::vector< std::vector<PolynomialExponential> > vecPolynomialExponentials); //循环尝试多个多项式线性组合值为0
 };
 

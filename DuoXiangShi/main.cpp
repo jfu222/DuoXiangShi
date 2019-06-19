@@ -26,8 +26,8 @@ int main(int argc, char *argv[])
 {
     int ret = 0;
     CDuoXiangShiZuHe dxszh;
-    std::string strSrc26EnglishLetters = "abcd";
-    int exponential = 4;
+    std::string strSrc26EnglishLetters = "abc"; // "abcd";
+    int exponential = strSrc26EnglishLetters.length(); //4;
     std::vector<std::string> vecStrsDst;
     dxszh.createCombinePolynomial(strSrc26EnglishLetters, exponential, vecStrsDst);
 

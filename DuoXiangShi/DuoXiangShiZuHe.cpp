@@ -207,7 +207,14 @@ int CDuoXiangShiZuHe::createCombinePolynomial(std::string strSrc26EnglishLetters
     cnt1 = 0;
     while(isTwoVecNumberLe(maxVecCnt2, maxVecNum2) == true) //相当于 i <= len;
     {
-        printf("%s: maxVecCnt2 = [%d, %d, %d, %d];\n", __FUNCTION__, maxVecCnt2[0], maxVecCnt2[1], maxVecCnt2[2], maxVecCnt2[3]);
+//        printf("%s: maxVecCnt2 = [%d, %d, %d, %d];\n", __FUNCTION__, maxVecCnt2[0], maxVecCnt2[1], maxVecCnt2[2], maxVecCnt2[3]);
+        
+        printf("%s: maxVecCnt = [", __FUNCTION__);
+        for (int i = 0; i < len; ++i)
+        {
+            printf("%d, ", maxVecCnt[i]);
+        }
+        printf("];\n", __FUNCTION__);
         
         if(maxVecCnt2[0] == 4 &&  maxVecCnt2[1] == 4 &&  maxVecCnt2[2] == 3 &&  maxVecCnt2[3] == 5)
         {
@@ -242,6 +249,7 @@ int CDuoXiangShiZuHe::createCombinePolynomial(std::string strSrc26EnglishLetters
     //-----------------------
     std::map<Momomia3, int>::iterator it33;
     std::vector<std::string> vecStrsDstTemp;
+    std::vector< std::vector<PolynomialExponential> > vecPolynomialExponentials;
     cnt1 = 0;
 
     for(it33 = hash33.begin(); it33 != hash33.end(); it33++)
@@ -249,6 +257,8 @@ int CDuoXiangShiZuHe::createCombinePolynomial(std::string strSrc26EnglishLetters
         Momomia3 mom3_temp = it33->first;
 
         std::string strTemp = "";
+        std::vector<PolynomialExponential> pes;
+        PolynomialExponential pe;
 
         for(int i = 0; i < mom3_temp.momomial.size(); ++i)
         {
@@ -259,9 +269,15 @@ int CDuoXiangShiZuHe::createCombinePolynomial(std::string strSrc26EnglishLetters
                     if(mom3_temp.momomial[i][j] == 1)
                     {
                         strTemp += "(" + vecStrsTemp[i][j + 1] + ")";
+                        pe.strPolynomial = vecStrsTemp[i][j + 1];
+                        pe.exponential = 1;
+                        pes.push_back(pe);
                     }else if(mom3_temp.momomial[i][j] > 1)
                     {
                         strTemp += "(" + vecStrsTemp[i][j + 1] + ")^" + std::to_string(mom3_temp.momomial[i][j]);
+                        pe.strPolynomial = vecStrsTemp[i][j + 1];
+                        pe.exponential = mom3_temp.momomial[i][j];
+                        pes.push_back(pe);
                     }
                 }
             }
@@ -270,6 +286,7 @@ int CDuoXiangShiZuHe::createCombinePolynomial(std::string strSrc26EnglishLetters
         if(mom3_temp.exponentialSum == exponential) //将两个多项式的指数和等于总指数的多项式配对，例如：(a+b+c)(a^2+b^2+c^2)是一对，(a+b+c)(ab+ac+bc)也是一对
         {
             vecStrsDstTemp.push_back(strTemp);
+            vecPolynomialExponentials.push_back(pes);
         }
 
         printf("%s: %d/%d: hash33[]: %s; exponentialSum=%d;\n", __FUNCTION__, cnt1, hash33.size(), strTemp.c_str(), mom3_temp.exponentialSum);
@@ -287,7 +304,7 @@ int CDuoXiangShiZuHe::createCombinePolynomial(std::string strSrc26EnglishLetters
     }
 
     //----------------------
-    ret = loopPolynomialCoefficientsValues(vecStrsDstTemp, 10);
+    ret = loopPolynomialCoefficientsValues(vecStrsDstTemp, 10, vecPolynomialExponentials);
 
     return 0;
 }
@@ -404,7 +421,7 @@ int CDuoXiangShiZuHe::vecPlusNonBaseN(std::vector<int> srcVec, std::vector<int> 
 
 
 //------------------------------
-int CDuoXiangShiZuHe::loopPolynomialCoefficientsValues(std::vector<std::string> strSrcVecs, int loopValueMax)
+int CDuoXiangShiZuHe::loopPolynomialCoefficientsValues(std::vector<std::string> strSrcVecs, int loopValueMax, std::vector< std::vector<PolynomialExponential> > vecPolynomialExponentials)
 {
     int len = strSrcVecs.size();
     int ret = 0;
@@ -413,18 +430,21 @@ int CDuoXiangShiZuHe::loopPolynomialCoefficientsValues(std::vector<std::string> 
     std::string str2 = "";
     std::string str3 = "";
     
-    int momomialValue[27] = {0};
+    int momomialValue1[27] = {0};
+    int momomialValue2[27] = {0};
     
     for(int i = 0; i < 26; ++i)
     {
-        momomialValue[i] = 1;
+        momomialValue1[i] = 1;
+        momomialValue2[i] = i + 1;
     }
 
     //----------------------
     CDuoXiangShi dxs;
     
     std::vector<std::string> strSrcVecs2;
-    std::vector<int> valueVecs2;
+    std::vector<int> valueVecs21;
+    std::vector<int> valueVecs22;
     
     for(int i = 0; i < len; ++i)
     {
@@ -440,12 +460,20 @@ int CDuoXiangShiZuHe::loopPolynomialCoefficientsValues(std::vector<std::string> 
         strSrcVecs2.push_back(str2);
         
         //------------------------------------------------
-        ret = dxs.setStrValue(str2, momomialValue, str3);
+        ret = dxs.setStrValue(str2, momomialValue1, str3);
 
         printf("str3: 4444: %s\n", str3.c_str());
 
-        int value = atoi(str3.c_str());
-        valueVecs2.push_back(value);
+        int value1 = atoi(str3.c_str());
+        valueVecs21.push_back(value1);
+
+        //------------------------------------------------
+        ret = dxs.setStrValue(str2, momomialValue2, str3);
+
+        printf("str3: 5555: %s\n", str3.c_str());
+
+        int value2 = atoi(str3.c_str());
+        valueVecs22.push_back(value2);
     }
 
     //---------------------------
@@ -479,16 +507,43 @@ int CDuoXiangShiZuHe::loopPolynomialCoefficientsValues(std::vector<std::string> 
         
         //----------------
         str = "";
-        int valueTotal = 0;
+        int valueTotal1 = 0;
+        int valueTotal2 = 0;
         int flag = 0;
+        std::vector<PolynomialExponential> pesLast;
         for(int i = 0; i < len; ++i)
         {
             int coefficients = maxVecCnt[i] - loopValueMax / 2;
-            flag = 0;
             if(maxVecCnt[i] > 0 && maxVecCnt[i] <= loopValueMax && coefficients != 0)
             {
-//                str += std::to_string(coefficients) + strSrcVecs[i]; //str2 = "3(+a+b+c)(ab+ac+bc)";
+                std::vector<PolynomialExponential> pesCommon;
+                if(pesLast.size() != 0)
+                {
+                    for(int j = 0; j < pesLast.size(); ++j)
+                    {
+                        for(int k = 0; k < vecPolynomialExponentials[i].size(); ++k)
+                        {
+                            if(pesLast[j].strPolynomial == vecPolynomialExponentials[i][k].strPolynomial)
+                            {
+                                PolynomialExponential pe;
+                                pe.strPolynomial = pesLast[j].strPolynomial;
+                                pe.exponential = std::min(pesLast[j].exponential, vecPolynomialExponentials[i][k].exponential);
+                                pesCommon.push_back(pe);
+                            }
+                        }
+                    }
+                }
 
+                if(flag == 0)
+                {
+                    pesLast = vecPolynomialExponentials[i];
+                }else
+                {
+                    pesLast = pesCommon;
+                }
+
+                //--------------------
+//                str += std::to_string(coefficients) + strSrcVecs[i]; //str2 = "3(+a+b+c)(ab+ac+bc)";
                 if(coefficients >= 0)
                 {
                     str += "+" + std::to_string(coefficients) + "(" + strSrcVecs2[i] + ")"; //str2 = "3(+a+b+c)(ab+ac+bc)";
@@ -497,13 +552,14 @@ int CDuoXiangShiZuHe::loopPolynomialCoefficientsValues(std::vector<std::string> 
                     str += std::to_string(coefficients) + "(" + strSrcVecs2[i] + ")"; //str2 = "3(+a+b+c)(ab+ac+bc)";
                 }
 
-                valueTotal += coefficients * valueVecs2[i];
+                valueTotal1 += coefficients * valueVecs21[i];
+                valueTotal2 += coefficients * valueVecs22[i];
                 flag = 1;
             }
         }
 
         //--------------------
-        if(valueTotal == 0 && flag == 1)
+        if(valueTotal1 == 0 && valueTotal2 == 0 && flag == 1 && pesLast.size() == 0)
         {
             //-----------------------
             str2 = str;
@@ -514,9 +570,9 @@ int CDuoXiangShiZuHe::loopPolynomialCoefficientsValues(std::vector<std::string> 
             printf("%s: str2: %s\n", __FUNCTION__, str2.c_str());
 
             //-------------
-            if(str2.length() < 50)
+            if(str2 == "+0")
             {
-                std::string strTemp = "-----------cnt=" + std::to_string(cnt) + ";\n";
+                std::string strTemp = ""; //"cnt=" + std::to_string(cnt) + ";\n";
                 std::string strTemp2 = "";
                 for(int i = 0; i < len; ++i)
                 {
