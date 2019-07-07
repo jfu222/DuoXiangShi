@@ -22,11 +22,11 @@ int print_help(int argc, char *argv[])
 }
 
 
-int main(int argc, char *argv[])
+int main1(int argc, char *argv[])
 {
     int ret = 0;
     CDuoXiangShiZuHe dxszh;
-    std::string strSrc26EnglishLetters = "abc"; // "abcd";
+    std::string strSrc26EnglishLetters = "abcd"; // "abcd";
     int exponential = strSrc26EnglishLetters.length(); //4;
     std::vector<std::string> vecStrsDst;
     dxszh.createCombinePolynomial(strSrc26EnglishLetters, exponential, vecStrsDst);
@@ -34,7 +34,114 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+
 int main2(int argc, char *argv[])
+{
+    int ret = 0;
+    CDuoXiangShiZuHe dxszh;
+
+    std::vector<std::string> vecStrSrcs;
+    std::string str = "";
+    int baseNum = 4;
+
+    str = "+a^3+b^3+c^3";
+    vecStrSrcs.push_back(str);
+    
+    str = "+ab^2+ac^2+bc^2+a^2b+a^2c+b^2c";
+    vecStrSrcs.push_back(str);
+    
+    str = "+abc";
+    vecStrSrcs.push_back(str);
+    
+    str = "+a^3+ab^2+ac^2+a^2b+b^3+bc^2+a^2c+b^2c+c^3";
+    vecStrSrcs.push_back(str);
+    
+    str = "+a^2b+a^2c+3abc+ab^2+b^2c+ac^2+bc^2";
+    vecStrSrcs.push_back(str);
+    
+    str = "+a^3+3a^2b+3a^2c+3ab^2+6abc+3ac^2+b^3+3b^2c+3bc^2+c^3";
+    vecStrSrcs.push_back(str);
+
+    //----------------------------------------------
+    ret = dxszh.convertStrsToInts(vecStrSrcs, baseNum);
+
+    return 0;
+}
+
+
+/*
+(+a^4+b^4+c^4+d^4)
+(+a^2b^2+a^2c^2+a^2d^2+b^2c^2+b^2d^2+c^2d^2)
+(+ab^3+ac^3+ad^3+bc^3+bd^3+cd^3+a^3b+a^3c+a^3d+b^3c+b^3d+c^3d)
+(+abc^2+abd^2+acd^2+bcd^2+ab^2c+ab^2d+ac^2d+bc^2d+a^2bc+a^2bd+a^2cd+b^2cd)
+(+abcd)
+(+a^2+b^2+c^2+d^2)^2
+(+ab+ac+ad+bc+bd+cd)^2
+(+a+b+c+d)(+a^3+b^3+c^3+d^3)
+(+a+b+c+d)(+ab^2+ac^2+ad^2+bc^2+bd^2+cd^2+a^2b+a^2c+a^2d+b^2c+b^2d+c^2d)
+(+a+b+c+d)(+abc+abd+acd+bcd)
+(+a+b+c+d)^2(+a^2+b^2+c^2+d^2)
+(+a+b+c+d)^2(+ab+ac+ad+bc+bd+cd)
+(+a+b+c+d)^4
+
+步骤8： 最终结果: +a^4+b^4+c^4+d^4;
+步骤8： 最终结果: +a^2b^2+a^2c^2+a^2d^2+b^2c^2+b^2d^2+c^2d^2;
+步骤8： 最终结果: +ab^3+ac^3+ad^3+bc^3+bd^3+cd^3+a^3b+a^3c+a^3d+b^3c+b^3d+c^3d;
+步骤8： 最终结果: +abc^2+abd^2+acd^2+bcd^2+ab^2c+ab^2d+ac^2d+bc^2d+a^2bc+a^2bd+a^2cd+b^2cd;
+步骤8： 最终结果: +abcd;
+步骤8： 最终结果: +a^4+2a^2b^2+2a^2c^2+2a^2d^2+b^4+2b^2c^2+2b^2d^2+c^4+2c^2d^2+d^4;
+步骤8： 最终结果: +a^2b^2+2a^2bc+2a^2bd+2ab^2c+2ab^2d+6abcd+a^2c^2+2a^2cd+2abc^2+2ac^2d+a^2d^2+2abd^2+2acd^2+b^2c^2+2b^2cd+2bc^2d+b^2d^2+2bcd^2+c^2d^2;
+步骤8： 最终结果: +a^4+ab^3+ac^3+ad^3+a^3b+b^4+bc^3+bd^3+a^3c+b^3c+c^4+cd^3+a^3d+b^3d+c^3d+d^4;
+步骤8： 最终结果: +2a^2b^2+2a^2c^2+2a^2d^2+2abc^2+2abd^2+2acd^2+a^3b+a^3c+a^3d+2ab^2c+2ab^2d+2ac^2d+ab^3+2b^2c^2+2b^2d^2+2bcd^2+2a^2bc+2a^2bd+b^3c+b^3d+2bc^2d+ac^3+bc^3+2c^2d^2+2a^2cd+2b^2cd+c^3d+ad^3+bd^3+cd^3;
+步骤8： 最终结果: +a^2bc+a^2bd+a^2cd+4abcd+ab^2c+ab^2d+b^2cd+abc^2+ac^2d+bc^2d+abd^2+acd^2+bcd^2;
+步骤8： 最终结果: +a^4+2a^2b^2+2a^2c^2+2a^2d^2+2a^3b+2ab^3+2abc^2+2abd^2+2a^3c+2ab^2c+2ac^3+2acd^2+2a^3d+2ab^2d+2ac^2d+2ad^3+b^4+2b^2c^2+2b^2d^2+2a^2bc+2b^3c+2bc^3+2bcd^2+2a^2bd+2b^3d+2bc^2d+2bd^3+c^4+2c^2d^2+2a^2cd+2b^2cd+2c^3d+2cd^3+d^4;
+步骤8： 最终结果: +a^3b+a^3c+a^3d+5a^2bc+5a^2bd+5a^2cd+2a^2b^2+5ab^2c+5ab^2d+12abcd+2a^2c^2+5abc^2+5ac^2d+2a^2d^2+5abd^2+5acd^2+ab^3+b^3c+b^3d+5b^2cd+2b^2c^2+5bc^2d+2b^2d^2+5bcd^2+ac^3+bc^3+c^3d+2c^2d^2+ad^3+bd^3+cd^3;
+步骤8： 最终结果: +a^4+4a^3b+4a^3c+4a^3d+6a^2b^2+12a^2bc+12a^2bd+6a^2c^2+12a^2cd+6a^2d^2+4ab^3+12ab^2c+12ab^2d+12abc^2+24abcd+12abd^2+4ac^3+12ac^2d+12acd^2+4ad^3+b^4+4b^3c+4b^3d+6b^2c^2+12b^2cd+6b^2d^2+4bc^3+12bc^2d+12bcd^2+4bd^3+c^4+4c^3d+6c^2d^2+4cd^3+d^4;
+*/
+int main(int argc, char *argv[])
+{
+    int ret = 0;
+    CDuoXiangShiZuHe dxszh;
+
+    std::vector<std::string> vecStrSrcs;
+    std::string str = "";
+    int baseNum = 5;
+    
+    str = "+a^4+b^4+c^4+d^4";
+    vecStrSrcs.push_back(str);
+    str = "+a^2b^2+a^2c^2+a^2d^2+b^2c^2+b^2d^2+c^2d^2";
+    vecStrSrcs.push_back(str);
+    str = "+ab^3+ac^3+ad^3+bc^3+bd^3+cd^3+a^3b+a^3c+a^3d+b^3c+b^3d+c^3d";
+    vecStrSrcs.push_back(str);
+    str = "+abc^2+abd^2+acd^2+bcd^2+ab^2c+ab^2d+ac^2d+bc^2d+a^2bc+a^2bd+a^2cd+b^2cd";
+    vecStrSrcs.push_back(str);
+    str = "+abcd";
+    vecStrSrcs.push_back(str);
+    str = "+a^4+2a^2b^2+2a^2c^2+2a^2d^2+b^4+2b^2c^2+2b^2d^2+c^4+2c^2d^2+d^4";
+    vecStrSrcs.push_back(str);
+    str = "+a^2b^2+2a^2bc+2a^2bd+2ab^2c+2ab^2d+6abcd+a^2c^2+2a^2cd+2abc^2+2ac^2d+a^2d^2+2abd^2+2acd^2+b^2c^2+2b^2cd+2bc^2d+b^2d^2+2bcd^2+c^2d^2";
+    vecStrSrcs.push_back(str);
+    str = "+a^4+ab^3+ac^3+ad^3+a^3b+b^4+bc^3+bd^3+a^3c+b^3c+c^4+cd^3+a^3d+b^3d+c^3d+d^4";
+    vecStrSrcs.push_back(str);
+    str = "+2a^2b^2+2a^2c^2+2a^2d^2+2abc^2+2abd^2+2acd^2+a^3b+a^3c+a^3d+2ab^2c+2ab^2d+2ac^2d+ab^3+2b^2c^2+2b^2d^2+2bcd^2+2a^2bc+2a^2bd+b^3c+b^3d+2bc^2d+ac^3+bc^3+2c^2d^2+2a^2cd+2b^2cd+c^3d+ad^3+bd^3+cd^3";
+    vecStrSrcs.push_back(str);
+    str = "+a^2bc+a^2bd+a^2cd+4abcd+ab^2c+ab^2d+b^2cd+abc^2+ac^2d+bc^2d+abd^2+acd^2+bcd^2";
+    vecStrSrcs.push_back(str);
+    str = "+a^4+2a^2b^2+2a^2c^2+2a^2d^2+2a^3b+2ab^3+2abc^2+2abd^2+2a^3c+2ab^2c+2ac^3+2acd^2+2a^3d+2ab^2d+2ac^2d+2ad^3+b^4+2b^2c^2+2b^2d^2+2a^2bc+2b^3c+2bc^3+2bcd^2+2a^2bd+2b^3d+2bc^2d+2bd^3+c^4+2c^2d^2+2a^2cd+2b^2cd+2c^3d+2cd^3+d^4";
+    vecStrSrcs.push_back(str);
+    str = "+a^3b+a^3c+a^3d+5a^2bc+5a^2bd+5a^2cd+2a^2b^2+5ab^2c+5ab^2d+12abcd+2a^2c^2+5abc^2+5ac^2d+2a^2d^2+5abd^2+5acd^2+ab^3+b^3c+b^3d+5b^2cd+2b^2c^2+5bc^2d+2b^2d^2+5bcd^2+ac^3+bc^3+c^3d+2c^2d^2+ad^3+bd^3+cd^3";
+    vecStrSrcs.push_back(str);
+    str = "+a^4+4a^3b+4a^3c+4a^3d+6a^2b^2+12a^2bc+12a^2bd+6a^2c^2+12a^2cd+6a^2d^2+4ab^3+12ab^2c+12ab^2d+12abc^2+24abcd+12abd^2+4ac^3+12ac^2d+12acd^2+4ad^3+b^4+4b^3c+4b^3d+6b^2c^2+12b^2cd+6b^2d^2+4bc^3+12bc^2d+12bcd^2+4bd^3+c^4+4c^3d+6c^2d^2+4cd^3+d^4";
+    vecStrSrcs.push_back(str);
+
+    //----------------------------------------------
+    ret = dxszh.convertStrsToInts(vecStrSrcs, baseNum);
+
+    return 0;
+}
+
+
+int main4(int argc, char *argv[])
 {
     int ret = 0;
     int cnt = 0;
@@ -193,7 +300,7 @@ int main2(int argc, char *argv[])
     sprintf(outPdfCmd, "pdflatex %s", outTex);
     printf("outPdfCmd: %s\n", outPdfCmd);
 
-//    system(outPdfCmd);
+    system(outPdfCmd);
 
 //    system("pause");
 

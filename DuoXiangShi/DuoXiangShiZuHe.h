@@ -195,6 +195,12 @@ typedef struct _PolynomialExponential_
 }PolynomialExponential;
 
 
+typedef struct _MatrixRowItem_
+{
+    int item[625];
+}MatrixRowItem;
+
+
 //-------------------------------------
 class CDuoXiangShiZuHe
 {
@@ -213,5 +219,9 @@ public:
     int vecPlusNonBaseN(std::vector<int> srcVec, std::vector<int> baseNVec, std::vector<int> summandVec, std::vector<int> &dstVec); //非等进制数组的加法（比如：个位为5进制，十位为3进制，...），主要用于替代多层for循环
 
     int loopPolynomialCoefficientsValues(std::vector<std::string> strSrcVecs, int loopValueMax, std::vector< std::vector<PolynomialExponential> > vecPolynomialExponentials); //循环尝试多个多项式线性组合值为0
+
+    int convertStrsToInts(const std::vector<std::string> srcStrs, int baseNum);
+    int calculateMomomiaIndex(const int momomial[27], const int baseNum, int &index, int &coefficient);
+    int convertMatrixItemToMomomial(const int index, const int coefficient, const int baseNum, int momomial[27]);
 };
 

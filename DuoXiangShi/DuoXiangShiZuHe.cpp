@@ -1,4 +1,5 @@
 #include "DuoXiangShiZuHe.h"
+#include <math.h>
 
 
 CDuoXiangShiZuHe::CDuoXiangShiZuHe()
@@ -614,3 +615,223 @@ int CDuoXiangShiZuHe::loopPolynomialCoefficientsValues(std::vector<std::string> 
     return 0;
 }
 
+/*
+ a   b  c
+[ ] [ ] [ ] ---    index
+ 0   0   0  ---      0 = 0*4^0 + 0*4^1 + 0*4^2
+ 1   0   0  ---      1 = 1*4^0 + 0*4^1 + 0*4^2
+ 2   0   0  ---      2 = 2*4^0 + 0*4^1 + 0*4^2
+ 3   0   0  ---      3 = 3*4^0 + 0*4^1 + 0*4^2
+ 0   1   0  ---      4 = 0*4^0 + 1*4^1 + 0*4^2
+ 1   1   0  ---      5 = 1*4^0 + 1*4^1 + 0*4^2
+ 2   1   2  ---      6 = 2*4^0 + 1*4^1 + 0*4^2
+ 3   1   3  ---      7 = 3*4^0 + 1*4^1 + 0*4^2
+ 0   2   0  ---      8 = 0*4^0 + 2*4^1 + 0*4^2
+ ... ...
+ 0   3   3  ---      60 = 0*4^0 + 3*4^1 + 3*4^2
+ 1   3   3  ---      61 = 1*4^0 + 3*4^1 + 3*4^2
+ 2   3   2  ---      62 = 2*4^0 + 3*4^1 + 3*4^2
+ 3   3   3  ---      63 = 3*4^0 + 3*4^1 + 3*4^2
+ ---------------------------------------------
+ 所以 准备一个64个元素的数组 int indexs[64];
+ 对于 str = 7a^3 + 3ab^2 + 4abc;
+      str = 7a^3b^0c^0 + 3a^1b^2c^0 + 4a^1b^1c^1;
+ 有   indexs = 7[3*4^0 + 0*4^1 + 0*4^2] + 3[1*4^0 + 2*4^1 + 0*4^2] + 4[1*4^0 + 1*4^1 + 1*4^2];
+      indexs = 7[3] + 3[9] + 4[21];
+      indexs[3] = 7;
+      indexs[9] = 3;
+      indexs[21] = 4;
+ */
+int CDuoXiangShiZuHe::convertStrsToInts(const std::vector<std::string> srcStrs, int baseNum)
+{
+    int ret = 0;
+//    const int baseNum = 5;
+//    const int maxExponentials = 4;
+//    int indexsSize = pow(baseNum, maxExponentials); // 64 = 4^3
+    int indexs[64] = {0};
+    std::vector<MatrixRowItem> matrixRows;
+    std::map<int, int> hash1;
+    CDuoXiangShi dxs;
+
+    int len1 = srcStrs.size();
+
+    for(int i = 0; i < len1; ++i)
+    {
+        std::string str = srcStrs[i];
+        std::vector<std::string> vecStrs;
+        ret = dxs.splitPlusAndMunisItems(str, vecStrs);
+        
+        MatrixRowItem rowItem = {0};
+        int len2 = vecStrs.size();
+        for(int j = 0; j < len2; ++j)
+        {
+            std::string str2 = vecStrs[j];
+            int momomial[27] = {0};
+            ret = dxs.splitMonomial(str2, momomial);
+            int index = 0;
+            int coefficient = 0;
+
+            ret = calculateMomomiaIndex(momomial, baseNum, index, coefficient);
+            
+            int momomial2[27] = {0};
+            ret = convertMatrixItemToMomomial(index, coefficient, baseNum, momomial2);
+
+            if(index == 2)
+            {
+                int a = 1;
+            }
+
+            rowItem.item[index] = coefficient;
+
+            hash1[index] +=1;
+        }
+        matrixRows.push_back(rowItem);
+    }
+
+    //-----------print-----------------
+    int colCnt = 0;
+    int flag = 0;
+    int len3 = matrixRows.size();
+    for (int i = 0; i < len3; ++i)
+    {
+        MatrixRowItem rowItem = matrixRows[i];
+        int len4 = sizeof(rowItem.item) / sizeof(rowItem.item[0]);
+        if(flag == 0)
+        {
+            flag = 1;
+            for (int j = 0; j < len4; ++j)
+            {
+                if(hash1.find(j) != hash1.end())
+                {
+                    colCnt++;
+                    printf("%02d-", j);
+                }
+            }
+            printf("\n");
+        }
+        for (int j = 0; j < len4; ++j)
+        {
+            if(hash1.find(j) != hash1.end())
+            {
+                printf("%02d ", rowItem.item[j]);
+            }
+        }
+        printf("\n");
+    }
+    printf("colCnt=%d;\n", colCnt);
+    
+    //-----------print2-----------------
+    std::map<std::string, int> hashStrs;
+    std::map<int, int> hash3;
+
+    MatrixRowItem rowItem = matrixRows[0];
+    int len4 = sizeof(rowItem.item) / sizeof(rowItem.item[0]);
+    for (int j = 0; j < len4; ++j)
+    {
+        std::string str = "";
+        if (hash1.find(j) != hash1.end())
+        {
+            for (int i = 0; i < len3; ++i)
+            {
+                rowItem = matrixRows[i];
+                str += std::to_string(rowItem.item[j]) + " ";
+            }
+            
+            if (hashStrs.find(str) == hashStrs.end())
+            {
+                hashStrs[str] += 1;
+                hash3[j] += 1;
+            }
+        }
+    }
+
+    //-------------
+    flag = 0;
+    colCnt = 0;
+    for (int i = 0; i < len3; ++i)
+    {
+        MatrixRowItem rowItem = matrixRows[i];
+        int len4 = sizeof(rowItem.item) / sizeof(rowItem.item[0]);
+        if(flag == 0)
+        {
+            flag = 1;
+            for (int j = 0; j < len4; ++j)
+            {
+                if(hash3.find(j) != hash3.end())
+                {
+                    colCnt++;
+                    printf("%02d-", j);
+                }
+            }
+            printf("\n");
+        }
+        for (int j = 0; j < len4; ++j)
+        {
+            if(hash3.find(j) != hash3.end())
+            {
+                printf("%02d ", rowItem.item[j]);
+            }
+        }
+        printf("\n");
+    }
+    printf("colCnt=%d;\n", colCnt);
+
+    return 0;
+}
+
+
+int CDuoXiangShiZuHe::calculateMomomiaIndex(const int momomial[27], const int baseNum, int &index, int &coefficient)
+{
+    //----------constant-------------
+    coefficient = momomial[26];
+    int index2 = 0;
+    
+    //----------character-------------
+    for(int i = 0; i < 26; ++i)
+    {
+        if(momomial[i] != 0)
+        {
+            int temp = 1;
+            for(int j = 0; j < i; ++j) // temp = 4^3;
+            {
+                temp *= baseNum;
+            }
+            index2 += momomial[i] * temp;
+        }
+    }
+
+    index = index2;
+    
+    return 0;
+}
+
+
+int CDuoXiangShiZuHe::convertMatrixItemToMomomial(const int index, const int coefficient, const int baseNum, int momomial[27])
+{
+    int remainder = index % baseNum;
+    momomial[26] = coefficient;
+
+    int exponential = 0;
+    int indexTemp = index / baseNum;
+    while (indexTemp > 0)
+    {
+        indexTemp /= baseNum;
+        exponential++;
+
+        if (exponential > 25)
+        {
+            return -1;
+        }
+    }
+
+    //--------------------------------------
+    indexTemp = index;
+    for(int i = exponential; i >= 0; --i)
+    {
+        int pow2 = pow(baseNum, i);
+        momomial[i] = indexTemp / pow2;
+        indexTemp %= pow2;
+    }
+
+    return 0;
+}
